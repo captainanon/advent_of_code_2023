@@ -1,7 +1,7 @@
 import re
 
 
-input = 'day_1/puzzle_2.txt'
+input = 'day_1/input.txt'
 strings = dict(zip(['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'], [1, 2, 3, 4, 5, 6, 7, 8, 9]))
 
 

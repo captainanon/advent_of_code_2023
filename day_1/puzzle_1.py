@@ -1,4 +1,4 @@
-input = 'day_1/puzzle_1.txt'
+input = 'day_1/input.txt'
 
 
 def solve(input):
