@@ -1,12 +1,14 @@
+# I did not solve this part without help
+
 input = 'day_5/input.txt'
 
 
-def solve(input):
-    lowest_location = 0
+def create_levels_and_mappings(input):
     with open(input) as file:
         end = len(file.readlines())
     with open(input) as file:
         i = 0
+        levels_and_mappings = []
         line = file.readline().strip('\n')
         while i <= end:
             if line.startswith('seeds:'):
@@ -30,6 +32,7 @@ def solve(input):
                     line = file.readline().strip('\n')
                     i += 1
                 seed_to_soil_map = dict(zip(source, destination))
+                levels_and_mappings.append(seed_to_soil_map)
                 line = file.readline().strip('\n')
                 i += 1
                 continue
@@ -45,6 +48,7 @@ def solve(input):
                     line = file.readline().strip('\n')
                     i += 1
                 soil_to_fertilizer_map = dict(zip(source, destination))
+                levels_and_mappings.append(soil_to_fertilizer_map)
                 line = file.readline().strip('\n')
                 i += 1
                 continue
@@ -60,6 +64,7 @@ def solve(input):
                     line = file.readline().strip('\n')
                     i += 1
                 fertilizer_to_water_map = dict(zip(source, destination))
+                levels_and_mappings.append(fertilizer_to_water_map)
                 line = file.readline().strip('\n')
                 i += 1
                 continue
@@ -75,6 +80,7 @@ def solve(input):
                     line = file.readline().strip('\n')
                     i += 1
                 water_to_light_map = dict(zip(source, destination))
+                levels_and_mappings.append(water_to_light_map)
                 line = file.readline().strip('\n')
                 i += 1
                 continue
@@ -90,6 +96,7 @@ def solve(input):
                     line = file.readline().strip('\n')
                     i += 1
                 light_to_temperature_map = dict(zip(source, destination))
+                levels_and_mappings.append(light_to_temperature_map)
                 line = file.readline().strip('\n')
                 i += 1
                 continue
@@ -105,6 +112,7 @@ def solve(input):
                     line = file.readline().strip('\n')
                     i += 1
                 temperature_to_humidity_map = dict(zip(source, destination))
+                levels_and_mappings.append(temperature_to_humidity_map)
                 line = file.readline().strip('\n')
                 i += 1
                 continue
@@ -120,68 +128,39 @@ def solve(input):
                     line = file.readline().strip('\n')
                     i += 1
                 humidity_to_location_map = dict(zip(source, destination))
+                levels_and_mappings.append(humidity_to_location_map)
                 line = file.readline().strip('\n')
                 i += 1
                 continue
             line = file.readline().strip('\n')
             i += 1
-    for seed in seeds:
-        for k, v in seed_to_soil_map.items():
-            soil = []
-            os = max(seed[0], k[0])
-            oe = min(seed[1], k[1])
-            if os < oe:
-                soil.append((os - k[0] + v[0], oe - k[0] + v[0]))
-                if os > seed[0]:
-                    seed.append((seed[0], os))
-                if seed[1] > oe:
-                    seed.append((oe, seed[1]))
-                break
+    return seeds, levels_and_mappings
+
+
+def solve(inputs, levels_and_mappings):
+    for level in levels_and_mappings:
+        next_inputs = []
+        while len(inputs) > 0:
+            input_start, input_end = inputs.pop()
+            for k, v in level.items():
+                map_in_start = k[0]
+                map_in_end = k[1]
+                map_out_start = v[0]
+                overlap_start = max(input_start, map_in_start)
+                overlap_end = min(input_end, map_in_end)
+                if overlap_start <= overlap_end:
+                    next_inputs.append((overlap_start - map_in_start + map_out_start, overlap_end - map_in_start + map_out_start))
+                    if overlap_start > input_start:
+                        inputs.append((input_start, overlap_start - 1))
+                    if input_end > overlap_end:
+                        inputs.append((overlap_end + 1, input_end))
+                    break
             else:
-                soil = seed
-        for k, v in soil_to_fertilizer_map.items():
-            if soil >= k[0] and soil <= k[1]:
-                fertilizer = (soil - k[0]) + v[0]
-                break
-            else:
-                fertilizer = soil
-        for k, v in fertilizer_to_water_map.items():
-            if fertilizer >= k[0] and fertilizer <= k[1]:
-                water = (fertilizer - k[0]) + v[0]
-                break
-            else:
-                water = fertilizer
-        for k, v in water_to_light_map.items():
-            if water >= k[0] and water <= k[1]:
-                light = (water - k[0]) + v[0]
-                break
-            else:
-                light = water
-        for k, v in light_to_temperature_map.items():
-            if light >= k[0] and light <= k[1]:
-                temperature = (light - k[0]) + v[0]
-                break
-            else:
-                temperature = light
-        for k, v in temperature_to_humidity_map.items():
-            if temperature >= k[0] and temperature <= k[1]:
-                humidity = (temperature - k[0]) + v[0]
-                break
-            else:
-                humidity = temperature
-        for k, v in humidity_to_location_map.items():
-            if humidity >= k[0] and humidity <= k[1]:
-                location = (humidity - k[0]) + v[0]
-                break
-            else:
-                location = humidity
-        if lowest_location == 0:
-            lowest_location = location
-        elif location < lowest_location:
-            lowest_location = location
-    return lowest_location
+                next_inputs.append((input_start, input_end))
+        inputs = next_inputs
+    return min(inputs)[0]
                
 
 if __name__ == '__main__':
-
-    print(solve(input)) #
+    seeds, levels_and_mappings = create_levels_and_mappings(input)
+    print(solve(seeds, levels_and_mappings)) # 57451709
