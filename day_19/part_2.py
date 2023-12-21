@@ -1,10 +1,4 @@
-import copy
-
-
-def solve(node, flag, x, m, a, s, x_, m_, a_, s_):
-    if node[1] == 'lnx':
-        pass
-    global sum_
+def solve(node, x, m, a, s, sum_):
     if node[0] is not None:
         rating = node[0][0]
         op = node[0][1]
@@ -12,56 +6,60 @@ def solve(node, flag, x, m, a, s, x_, m_, a_, s_):
         if rating == 'x':
             if op == '>':
                 x = set([i for i in x if i > num])
-                x_ = set([i for i in x_ if i <= num])
-                flag = 'x'
             else:
                 x = set([i for i in x if i < num])
-                x_ = set([i for i in x_ if i >= num])
-                flag = 'x'
         elif rating == 'm':
             if op == '>':
                 m = set([i for i in m if i > num])
-                m_ = set([i for i in m_ if i <= num])
-                flag = 'm'
             else:
                 m = set([i for i in m if i < num])
-                m_ = set([i for i in m_ if i >= num])
-                flag = 'm'
         elif rating == 'a':
             if op == '>':
                 a = set([i for i in a if i > num])
-                a_ = set([i for i in a_ if i <= num])
-                flag = 'a'
             else:
                 a = set([i for i in a if i < num])
-                a_ = set([i for i in a_ if i >= num])
-                flag = 'a'
         elif rating == 's':
             if op == '>':
                 s = set([i for i in s if i > num])
-                s_ = set([i for i in s_ if i <= num])
-                flag = 's'
             else:
                 s = set([i for i in s if i < num])
-                s_ = set([i for i in s_ if i >= num])
-                flag = 's'
     if node[1] == 'A':
         sum_ += len(x) * len(m) * len(a) * len(s)
+    cache_ = []
     if node[1] not in ('A', 'R'):
-        for idx, neighbour in enumerate(graph[node[1]]):
+        for idx, neighbor in enumerate(graph[node[1]]):
+            if neighbor[0] is not None:
+                cache_.append(neighbor[0])       
             if idx == 0:
-                flag, x, m, a, s, x_, m_, a_, s_ = solve(neighbour, flag, x, m, a, s, x_, m_, a_, s_)
+                sum_ = solve(neighbor, x, m, a, s, sum_)
             else:
-                if flag == 'x':
-                    x = copy.deepcopy(x_)
-                elif flag == 'm':
-                    m = copy.deepcopy(m_)
-                elif flag == 'a':
-                    a = copy.deepcopy(a_)
-                elif flag == 's':
-                    s = copy.deepcopy(s_)
-                flag, x, m, a, s, x_, m_, a_, s_ = solve(neighbour, flag, x, m, a, s, x_, m_, a_, s_)
-    return flag, x, m, a, s, x_, m_, a_, s_
+                for i in range(idx):
+                    expression = cache_[i]
+                    rating = expression[0]
+                    op = expression[1]
+                    num = int(expression[2:])
+                    if rating == 'x':
+                        if op == '>':
+                            x = set([i for i in x if i <= num])
+                        else:
+                            x = set([i for i in x if i >= num])
+                    if rating == 'm':
+                        if op == '>':
+                            m = set([i for i in m if i <= num])
+                        else:
+                            m = set([i for i in m if i >= num])
+                    if rating == 'a':
+                        if op == '>':
+                            a = set([i for i in a if i <= num])
+                        else:
+                            a = set([i for i in a if i >= num])
+                    if rating == 's':
+                        if op == '>':
+                            s = set([i for i in s if i <= num])
+                        else:
+                            s = set([i for i in s if i >= num])
+                sum_ = solve(neighbor, x, m, a, s, sum_)
+    return sum_
 
 
 input = 'day_19/input.txt'
@@ -77,12 +75,7 @@ x = set(range(1, 4001))
 m = set(range(1, 4001))
 a = set(range(1, 4001))
 s = set(range(1, 4001))
-x_= set(range(1, 4001))
-m_ = set(range(1, 4001))
-a_ = set(range(1, 4001))
-s_ = set(range(1, 4001))
 sum_ = 0
-solve((None, 'in'), '', x, m, a, s, x_, m_, a_, s_)
-print(sum_)
-43190588835500
-167409079868000
+start = (None, 'in')
+sum_ = solve(start, x, m, a, s, sum_)
+print(sum_) # 116606738659695
