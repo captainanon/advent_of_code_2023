@@ -1,6 +1,3 @@
-input = 'day_10/input.txt'
-
-
 def is_loop(prev, node):
     result = False
     while True:
@@ -125,6 +122,7 @@ def is_loop(prev, node):
     return result
 
 
+input = 'day_10/input.txt'
 with open(input) as file:
     data = file.read().splitlines()
 for r, line in enumerate(data):

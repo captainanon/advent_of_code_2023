@@ -1,4 +1,14 @@
-input = 'day_10/input.txt'
+def area(v):
+    n = len(v)
+    s1 = 0
+    s2 = 0
+    for i in range(0, n-1):
+        s1 += v[i][0] *  v[i+1][1]
+        s2 += v[i+1][0] * v[i][1]
+    s1 += v[n-1][0] * v[0][1]   
+    s2 += v[0][0] * v[n-1][1]   
+    area = abs(s1 - s2) / 2
+    return area
 
 
 def is_loop(prev, node):
@@ -6,9 +16,6 @@ def is_loop(prev, node):
     while True:
         path.append(node)
         type = data[node[0]][node[1]]
-        if node == start:
-                result = True
-                break
         if node[0] - prev[0] == 1:
             if type == '|':
                 if node[0] + 1 < r:
@@ -31,9 +38,13 @@ def is_loop(prev, node):
                         break
                 else:
                     break
-            prev = node
-            node = next
-            continue
+            if next == start:
+                result = True
+                break
+            else:
+                prev = node
+                node = next
+                continue
         elif node[0] - prev[0] == -1:
             if type == '|':
                 if node[0] - 1 >= 0:
@@ -56,9 +67,13 @@ def is_loop(prev, node):
                         break
                 else:
                     break
-            prev = node
-            node = next
-            continue
+            if next == start:
+                result = True
+                break
+            else:
+                prev = node
+                node = next
+                continue
         elif node[1] - prev[1] == -1:
             if type == '-':
                 if node[1] - 1 >= 0:
@@ -81,9 +96,13 @@ def is_loop(prev, node):
                         break
                 else:
                     break
-            prev = node
-            node = next
-            continue
+            if next == start:
+                result = True
+                break
+            else:
+                prev = node
+                node = next
+                continue
         elif node[1] - prev[1] == 1:
             if type == '-':
                 if node[1] + 1 < c:
@@ -106,22 +125,23 @@ def is_loop(prev, node):
                         break
                 else:
                     break
-            prev = node
-            node = next
-            continue
+            if next == start:
+                result = True
+                break
+            else:
+                prev = node
+                node = next
+                continue
     return result
 
 
-coords = []
+input = 'day_10/input.txt'
 with open(input) as file:
     data = file.read().splitlines()
 for r, line in enumerate(data):
-    temp = []
     for c, char_ in enumerate(line):
-        temp.append((r, c))
         if char_ == 'S':
             start = (r, c)
-    coords.append(temp)
 r = len(data)
 c = len(data[0])
 for idx, neighbor in enumerate([data[start[0]][start[1]+1], data[start[0]-1][start[1]], data[start[0]][start[1]-1], data[start[0]+1][start[1]]]):
@@ -138,18 +158,7 @@ for idx, neighbor in enumerate([data[start[0]][start[1]+1], data[start[0]-1][sta
     elif idx == 3 and neighbor in ('|', '7', 'F'):
         if is_loop(start, (start[0]+1, start[1])):
             break
-
-throw_out = set()
-for row in coords:
-    for coord in row:
-        if coord in path:
-            throw_out.add(coord)
-            continue
-        count = 0
-        while coord[1] < c:
-            coord = (coord[0], coord[1]-1)
-            type = data[coord[0]][coord[1]]
-            if coord in path and type == '|':
-                count += 1
-            
-print(result) # 6823
+perimeter = len(path)
+total_area = area(path)
+interior_area = total_area - perimeter / 2 + 1
+print(int(interior_area)) # 415
